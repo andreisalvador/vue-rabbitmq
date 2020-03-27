@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "amqplib": "^0.5.5",
     "core-js": "^3.6.4",
     "vue": "^2.6.11"
   },

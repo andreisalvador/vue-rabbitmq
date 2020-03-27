@@ -21,17 +21,7 @@ export default {
     name: String,
     routingKey: String,
     messages: Array
-  },
-  data() {
-    return {
-      options: {
-        durable: true
-      },
-      consumeOptions: {
-        noAck: true
-      }
-    };
-  }
+  } 
 };
 </script>
 

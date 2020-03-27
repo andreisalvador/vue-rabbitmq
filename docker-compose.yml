@@ -9,3 +9,9 @@ services:
       - ./rabbitmq-queue-design:/usr/app
     ports:
       - 8000:8080        
+  rabbitmq-server:
+    image: rabbitmq:latest
+    container_name: rabbitmq_andrei
+    hostname: andrei_host
+    ports:
+      - "5671:5672"     

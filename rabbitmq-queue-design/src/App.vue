@@ -2,6 +2,7 @@
   <div id="app">
     <button @click="clearAll">Clear all</button>
     <button v-if="queues.length > 0" @click="consumeQueues">Consume Queues</button>
+    <button @click="sendMessage">Send message</button>
     <label for="exchange-type">Exchange name</label>
     <input required type="text" name="exchange-name" id="exchange-name" v-model="exchange.name" />
     <label for="exchange-type">Exchange type</label>
@@ -14,9 +15,14 @@
       v-model="exchange.routingKey"
     />
     <label for="exchange-message">Message</label>
-    <textarea name="exchange-message" id="exchange-message" maxlength="140" v-model="exchange.message" />
+    <textarea
+      name="exchange-message"
+      id="exchange-message"
+      maxlength="140"
+      v-model="exchange.message"
+    />
     <br />
-    <Exchange      
+    <Exchange
       :type="exchange.type"
       :routingKey="exchange.routingKey"
       :name="exchange.name"
@@ -24,12 +30,12 @@
       @startAddQueue="startAddQueue($event)"
     />
     <br />
-    <div v-if="showAddQueueForm">      
+    <div v-if="showAddQueueForm">
       <label for="queue-type">Queue name</label>
       <input type="text" name="queue-name" id="queue-name" v-model="queue.name" />
       <label for="queue-routingKey">Queue rounting key</label>
       <input type="text" name="queue-routingKey" id="queue-routingKey" v-model="queue.routingKey" />
-      <button @click="addQueue(queue)">Add Queue</button>      
+      <button @click="addQueue(queue)">Add Queue</button>
     </div>
     <br />
     <div v-for="(item, index) in queues" :key="index">
@@ -41,6 +47,8 @@
 <script>
 import Exchange from "./components/rabbit/exchange/Exchange.vue";
 import Queue from "./components/rabbit/queue/Queue.vue";
+import Publisher from "./rabbitmq-connections/publisher/PublisherBase";
+import Subscriber from "./rabbitmq-connections/subcriber/SubscriberBase";
 
 export default {
   name: "App",
@@ -54,6 +62,9 @@ export default {
         name: "",
         type: "",
         routingKey: "",
+        options: {
+          durable: false
+        },
         message: ""
       },
       queue: {
@@ -68,10 +79,16 @@ export default {
     startAddQueue() {
       this.showAddQueueForm = true;
     },
-    addQueue(queue) { 
+    addQueue(queue) {
       this.queues.push({
         name: queue.name,
         routingKey: queue.routingKey,
+        options: {
+          durable: true
+        },
+        consumeOptions: {
+          noAck: true
+        },
         messages: []
       });
       this.queue.name = "";
@@ -83,14 +100,14 @@ export default {
         type: "",
         routingKey: "",
         message: ""
-      }
-      this.queues = []
+      };
+      this.queues = [];
     },
-    consumeQueues(){
-      console.log(this.queues)
-      this.queues.forEach(queue => {
-        queue.messages.push({content:'Message cara'})
-      });
+    consumeQueues() {
+      Subscriber(this.queues);
+    },
+    sendMessage() {      
+      Publisher(this.exchange.message, this.queues, this.exchange);
     }
   }
 };
@@ -100,7 +117,7 @@ export default {
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   text-align: center;
-  margin-top: 60px;  
+  margin-top: 60px;
   display: flex;
   height: 100%;
   width: 100%;
