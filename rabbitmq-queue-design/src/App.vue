@@ -6,7 +6,12 @@
     <label for="exchange-type">Exchange name</label>
     <input required type="text" name="exchange-name" id="exchange-name" v-model="exchange.name" />
     <label for="exchange-type">Exchange type</label>
-    <input required type="text" name="exchange-type" id="exchange-type" v-model="exchange.type" />
+    <select name="exchange-type" id="exchange-type-id" v-model="exchange.type">
+      <option value="fanout">Fanout</option>
+      <option value="direct">Direct</option>
+      <option value="topic">Topic</option>
+      <option value="headers">Headers</option>
+    </select>
     <label for="exchange-routingKey">Exchange rounting key</label>
     <input
       type="text"
